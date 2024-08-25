@@ -2,28 +2,7 @@ package test.assertk.assertions
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.any
-import assertk.assertions.atLeast
-import assertk.assertions.atMost
-import assertk.assertions.contains
-import assertk.assertions.containsAtLeast
-import assertk.assertions.containsExactly
-import assertk.assertions.containsExactlyInAnyOrder
-import assertk.assertions.containsNone
-import assertk.assertions.containsOnly
-import assertk.assertions.doesNotContain
-import assertk.assertions.each
-import assertk.assertions.exactly
-import assertk.assertions.extracting
-import assertk.assertions.first
-import assertk.assertions.isEmpty
-import assertk.assertions.isEqualTo
-import assertk.assertions.isGreaterThan
-import assertk.assertions.isGreaterThanOrEqualTo
-import assertk.assertions.isLessThan
-import assertk.assertions.isNotEmpty
-import assertk.assertions.none
-import assertk.assertions.single
+import assertk.assertions.*
 import test.assertk.opentestPackageName
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -623,6 +602,23 @@ class IterableTest {
             assertThat(listOf(1, 2)).single().isEqualTo(1)
         }
         assertEquals("expected to have single element but has 2: <[1, 2]>", error.message)
+    }
+    //endregion
+
+    //region isSorted
+    @Test
+    fun sorted_list() {
+        val list = listOf("a", "b", "c")
+        assertThat(list).isSorted()
+    }
+
+    @Test
+    fun unsorted_list() {
+        val list = listOf("c", "b", "a")
+        val error = assertFailsWith<AssertionError> {
+            assertThat(list).isSorted()
+        }
+        assertEquals("expected elements 0 and 1 to be in order but was c and b", error.message)
     }
     //endregion
 

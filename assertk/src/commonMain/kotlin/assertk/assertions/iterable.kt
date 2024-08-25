@@ -331,3 +331,42 @@ fun <E, T : Iterable<E>> Assert<T>.single(): Assert<E> {
         }
     }
 }
+
+fun <E, T : Iterable<E>> Assert<T>.isSorted(comparator: Comparator<E>) {
+    // TODO replace with transform?
+    given { actual ->
+        all {
+            actual.withPreviousElement().forEachIndexed { i, (previous, current) ->
+                if (comparator.compare(previous, current) > 0) {
+                    // TODO fail for all out-of-order indices
+                    expected("elements $i and ${i + 1} to be in order but was $previous and $current")
+                }
+            }
+        }
+    }
+}
+
+private fun <T> Iterable<T>.withPreviousElement(): Iterable<Pair<T, T>> {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return emptyList()
+    var previous: T = iterator.next()
+
+    return object : Iterable<Pair<T, T>> {
+        override fun iterator(): Iterator<Pair<T, T>> {
+            @Suppress("IteratorNotThrowingNoSuchElementException") // thrown by delegate iterator
+            return object : Iterator<Pair<T, T>> {
+                override fun hasNext() = iterator.hasNext()
+
+                override fun next(): Pair<T, T> {
+                    val current = iterator.next()
+                    return Pair(previous, current)
+                        .also { previous = current }
+                }
+            }
+        }
+    }
+}
+
+fun <E : Comparable<E>, T : Iterable<E>> Assert<T>.isSorted() {
+    isSorted { a, b -> a.compareTo(b) }
+}
