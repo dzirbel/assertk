@@ -2,6 +2,7 @@ package assertk.assertions
 
 import assertk.Assert
 import assertk.all
+import assertk.assertThat
 import assertk.collection
 import assertk.assertions.support.appendName
 import assertk.assertions.support.expected
@@ -330,4 +331,13 @@ fun <E, T : Iterable<E>> Assert<T>.single(): Assert<E> {
             expected("to have single element but was empty")
         }
     }
+}
+
+private fun <T> Iterable<T>.withPreviousElement(): Iterable<Pair<T, T>> {
+    return map { it to it }
+}
+
+fun <E, T : Iterable<E>> Assert<T>.isSorted(comparator: Comparator<E>) {
+    transform { it.withPreviousElement() }
+    // adding ".e" on the previous line to get autocomplete here freezes IntelliJ
 }
